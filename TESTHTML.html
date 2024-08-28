@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contenu Protégé</title>
+    <style>
+        #content {
+            display: none;
+        }
+        #warning {
+            display: none;
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <h1>Contenu Protégé</h1>
+        <p>Voici votre contenu sensible...</p>
+        <video id="protectedVideo" controls>
+            <source src="123456.mp4" type="video/mp4">
+        </video>
+    </div>
+    <div id="warning">
+        Tentative de capture d'écran détectée. Accès au contenu révoqué.
+    </div>
+
+    <script>
+        let contentBlocked = false;
+
+        function showContent() {
+            if (!contentBlocked) {
+                document.getElementById('content').style.display = 'block';
+            }
+        }
+
+        function blockContent() {
+            contentBlocked = true;
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('warning').style.display = 'block';
+            // Arrêter la vidéo si elle est en cours de lecture
+            const video = document.getElementById('protectedVideo');
+            if (video) {
+                video.pause();
+                video.currentTime = 0;
+            }
+        }
+
+        // Détecter la touche PrtScn
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'PrintScreen') {
+                blockContent();
+            }
+        });
+
+        // Détecter Ctrl+P (pour l'impression)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                blockContent();
+            }
+        });
+
+        // Détecter le clic droit (pour le menu contextuel)
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            blockContent();
+        });
+
+        // Détecter si la fenêtre perd le focus (potentielle utilisation d'outils de capture externes)
+        window.addEventListener('blur', () => {
+            blockContent();
+        });
+
+        // Afficher le contenu initialement
+        showContent();
+    </script>
+</body>
+</html>
